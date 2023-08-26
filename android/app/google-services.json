@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "468487970493",
+    "firebase_url": "https://hostel-connect-106e0-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "hostel-connect-106e0",
+    "storage_bucket": "hostel-connect-106e0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468487970493:android:131c0ab88b908a8e34e1d4",
+        "android_client_info": {
+          "package_name": "com.example.hostel_connect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "468487970493-gqvm4mnosf7ldt9963i1sjofm5r6oa8k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3B_XdjiHCz_VGSaB4zb_AXQ_APmGB2Ms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "468487970493-gqvm4mnosf7ldt9963i1sjofm5r6oa8k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
