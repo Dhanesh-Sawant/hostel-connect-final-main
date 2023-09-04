@@ -10,6 +10,7 @@ import 'package:hostel_connect/Screens/Users/complaint_card_screen.dart';
 import 'package:hostel_connect/Screens/Users/home_screen_user.dart';
 import 'package:hostel_connect/Screens/Users/login_screen_user.dart';
 import 'package:hostel_connect/Screens/Users/mycomplaints.dart';
+import 'package:hostel_connect/Screens/Users/otp_screen.dart';
 import 'package:hostel_connect/Screens/Users/status_screen.dart';
 import 'package:provider/provider.dart';
 import 'Provider/block_users_provider.dart';
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
           OtpVerification.PageRoute : (context) => OtpVerification(),
           MyComplaints.PageRoute : (context) => MyComplaints(),
           LayoutScreen.PageRoute : (context) => LayoutScreen(),
+          OtpScreen.PageRoute : (context) => OtpScreen(),
         },
 
         debugShowCheckedModeBanner: false,

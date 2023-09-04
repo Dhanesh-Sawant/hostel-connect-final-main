@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../Utils/colors.dart';
+
 class InputTextField extends StatelessWidget {
 
   const InputTextField({
@@ -19,12 +21,17 @@ class InputTextField extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final inputborder = OutlineInputBorder(
-        borderSide: Divider.createBorderSide(context)
+        borderSide: BorderSide(
+          color: purplemaincolor,
+          width: 2
+        ),
     );
 
     return TextField(
       controller: textEditingController,
       decoration: InputDecoration(
+
+        fillColor: Colors.transparent.withOpacity(0.3),
         hintText: hintText,
         border: inputborder,
         enabledBorder: inputborder,

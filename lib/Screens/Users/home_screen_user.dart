@@ -32,13 +32,25 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
   int temp = 0;
 
 
-  String? rc;
-  String? ac;
-  String? ec;
-  String? c;
+  List<String>? rc;
+  List<String>? ac;
+  List<String>? ec;
+  List<String>? c;
+
+
+  String? atlastshowRequest;
+  String? atlastReqStatus;
+
+  int? oldestDate = -1;
+  int? oldestTime = -1;
+
+  bool isProgress = false;
+
 
   Future<String?> refreshuser()async{
+
     print("inside refreshuser");
+
     await Provider.of<UserProvider>(context,listen:false).refreshUser();
 
     user = Provider.of<UserProvider>(context,listen:false).getUser;
@@ -49,38 +61,43 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
     print("ended refreshuser");
 
 
-    Future.wait([
+    await Future.wait([
       Provider.of<StatusProvider>(context,listen: false).refreshComplaintStatus(uid!,RN!)
     ]);
+
     return username;
   }
 
-  Future<Map<String,String>> refreshstatus()async{
+  Future<List<String>> refreshstatus()async{
 
-    temp=0;
-
-    Map<String,String> status = {};
-
-    print("inside refreshstatus");
-
-    rc = Provider.of<StatusProvider>(context,listen: false).getStatus_RC;
-    ac = Provider.of<StatusProvider>(context,listen: false).getStatus_AC;
-    ec = Provider.of<StatusProvider>(context,listen: false).getStatus_EC;
-    c = Provider.of<StatusProvider>(context,listen: false).getStatus_C;
-
-    status['RC'] = rc!;
-    status['AC'] = ac!;
-    status['EC'] = ec!;
-    status['C'] = c!;
-
-    print('$rc $ac $ec $c');
-
-    print("ended refreshstatus");
+    // Map<String,List<String>> status = {};
+    //
+    // print("inside refreshstatus");
+    //
+    // rc = Provider.of<StatusProvider>(context,listen: false).getStatus_RC;
+    // ac = Provider.of<StatusProvider>(context,listen: false).getStatus_AC;
+    // ec = Provider.of<StatusProvider>(context,listen: false).getStatus_EC;
+    // c = Provider.of<StatusProvider>(context,listen: false).getStatus_C;
+    //
+    // status['RC'] = rc!;
+    // status['AC'] = ac!;
+    // status['EC'] = ec!;
+    // status['C'] = c!;
+    //
+    // print("printing from refreshstatus()");
+    // print('$rc $ac $ec $c');
+    //
+    // print("ended refreshstatus");
 
     // await Future.wait([
-    //   Future.delayed(Duration(seconds: 3))
+    //   Future.delayed(Duration(seconds: 10))
     // ]);
-    return status;
+
+
+    String tempwaiting = await Provider.of<StatusProvider>(context,listen: false).getLatestWaiting ?? "No complaints";
+    String tempprogress = await Provider.of<StatusProvider>(context,listen: false).getLatestProgress ?? "No complaints";
+
+    return [tempwaiting, tempprogress];
 
   }
 
@@ -101,12 +118,11 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
 
   @override
   void initState() {
-    print("init state called");
-    // TODO: implement initState
+    // print("init state called");
     super.initState();
-    print("refresh data called");
-    initDataFuture = refreshData();
-    print("init state finished");
+    // print("refresh data called");
+    // initDataFuture = refreshData();
+    // print("init state finished");
   }
 
 
@@ -124,16 +140,7 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: FutureBuilder(
-              future: Future.delayed(Duration(seconds: 2)),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting)
-                {
-                  return Center(child: CircularProgressIndicator(color: Colors.blue));
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}}');
-                } else {
-                  return Padding(
+          child: Padding(
                     padding: const EdgeInsets.only(left: 24, right: 24, bottom: 16),
                     child: FutureBuilder(
                         future: refreshuser(),
@@ -149,12 +156,7 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
                           }
                         }
                     ),
-                  );
-                }
-              }
-          ),
-        ),
-      ),
+                  )))
     );
   }
 
@@ -199,14 +201,11 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
                   children: [
                     Text('Ongoing Requests', style: appTextStyle(20.0, Colors.white, FontWeight.bold)),
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String,String>>(
+                    FutureBuilder<List<String>>(
                         future: refreshstatus(),
                         builder: (context, snapshot) {
 
-                          if(snapshot.data?['RC']! == "Not Available"){temp++;};
-                          if(snapshot.data?['AC']! == "Not Available"){temp++;};
-                          if(snapshot.data?['EC']! == "Not Available"){temp++;};
-                          if(snapshot.data?['C']! == "Not Available"){temp++;};
+                          print("the final request is $atlastshowRequest");
 
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             // While data is being loaded, you can show a loading indicator.
@@ -219,55 +218,11 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
 
                             return Column(
                                 children: [
-                                  snapshot.data?['RC'] != "Not Available" ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Room Cleaning', style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
-                                      Row(
-                                        children: [
-                                          snapshot.data!['RC']! == "waiting" ? Icon(LineIcons.hourglassHalf, color: Colors.white, size: 22): Icon(LineIcons.checkCircle, color: Colors.white, size: 22),
-                                          Text(snapshot.data!['RC']!, style: appTextStyle(18.0, Colors.white, FontWeight.w500)),
-                                        ],
-                                      )
-                                    ],
-                                  ) : SizedBox(),
 
-                                  snapshot.data?['AC'] != "Not Available" ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('AC complaint', style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
-                                      Row(
-                                        children: [
-                                          snapshot.data!['AC']! == "waiting" ? Icon(LineIcons.hourglassHalf, color: Colors.white, size: 20): Icon(LineIcons.checkCircle, color: Colors.white, size: 20),
-                                          Text(snapshot.data!['AC']!, style: appTextStyle(18.0, Colors.white, FontWeight.w500)),
-                                        ],
-                                      )
-                                    ],
-                                  ) : SizedBox(),
+                                  snapshot.data![1] != "No complaints" ? Text(snapshot.data![1], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500))
+                                    :
+                                      Text(snapshot.data![0], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
 
-                                  snapshot.data?['EC'] != "Not Available" ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Electric Complaint', style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
-                                      Row(
-                                        children: [
-                                          snapshot.data!['EC']! == "waiting" ? Icon(LineIcons.hourglassHalf, color: Colors.white, size: 20): Icon(LineIcons.checkCircle, color: Colors.white, size: 20),
-                                          Text(snapshot.data!['EC']!, style: appTextStyle(18.0, Colors.white, FontWeight.w500)),
-                                        ],
-                                      )],
-                                  ) : SizedBox(),
-
-                                  snapshot.data?['C'] != "Not Available" ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text('Carpentry', style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
-                                      Row(
-                                        children: [
-                                          snapshot.data!['C']! == "waiting" ? Icon(LineIcons.hourglassHalf, color: Colors.white, size: 20): Icon(LineIcons.checkCircle, color: Colors.white, size: 20),
-                                          Text(snapshot.data!['C']!, style: appTextStyle(18.0, Colors.white, FontWeight.w500)),
-                                        ],
-                                      )],
-                                  ) : SizedBox(),
                                 ]
                             );
                           }

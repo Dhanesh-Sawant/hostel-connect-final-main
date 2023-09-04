@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:provider/provider.dart';
 import '../Models/Users.dart' as model;
-import '../Provider/image_provider.dart';
-import '../Provider/user_provider.dart';
 import 'package:intl/intl.dart';
+
+import '../Provider/status_provider.dart';
 
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -22,11 +20,8 @@ class StorageMethods{
     String result = 'some error';
 
     DateTime now = DateTime.now();
-    String timeAt = DateFormat('dd-MM – kk:mm').format(now);
-
-    // String timeAt = now.toString();
-
-    print(now.toString());
+    String timeAt = DateFormat('Hm').format(now);
+    String dateAt = DateFormat('dd MMMM, yyyy').format(now);
 
     
     try{
@@ -50,9 +45,12 @@ class StorageMethods{
               "timming" : timming,
               "timeAt" : timeAt,
               "username" : user.username,
-              "uid" : user.uid
+              "uid" : user.uid,
+              "dateAt" : dateAt
             }
         );
+
+
 
         print("exit");
         result = "success";
@@ -72,7 +70,8 @@ class StorageMethods{
     String result = 'some error';
 
     DateTime now = DateTime.now();
-    String timeAt = DateFormat('dd-MM – kk:mm').format(now);
+    String timeAt = DateFormat('Hm').format(now);
+    String dateAt = DateFormat('dd MMMM, yyyy').format(now);
 
     // String timeAt = now.toString();
 
@@ -97,7 +96,8 @@ class StorageMethods{
               "timeAt" : timeAt,
               "username" : user.username,
               "uid" : user.uid,
-             "image": file
+             "image": file,
+              "dateAt" : dateAt
             }
         );
 

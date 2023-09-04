@@ -11,6 +11,8 @@ class AdminProvider with ChangeNotifier {
 
   String get getEid => _admin.eid;
   String get getBlock => _admin.block;
+  String get getUsername => _admin.username;
+
 
   Future<void> refreshAdmin() async {
     Admin admin = await _authMethods.getAdminDetails();

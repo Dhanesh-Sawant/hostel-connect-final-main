@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:hostel_connect/Screens/Users/complaint_card_screen.dart';
-import 'package:hostel_connect/Screens/Users/general_complaints.dart';
+import 'package:hostel_connect/Screens/Admin/dashboard_admin.dart';
 
-import '../Utils/app_style.dart';
+import '../../Utils/app_style.dart';
 
-class ReusableButton extends StatelessWidget {
-  const ReusableButton({
+class AdminReusableButton extends StatelessWidget {
+  const AdminReusableButton({
     super.key, required this.content, required this.url
   });
 
@@ -18,8 +17,8 @@ class ReusableButton extends StatelessWidget {
       height: MediaQuery.of(context).size.height*0.13,
       decoration:  BoxDecoration(
         border: Border.all(
-          color: Colors.blue,
-          width: 1.5
+            color: Colors.blue,
+            width: 1.5
         ),
         borderRadius: BorderRadius.circular(14),
         gradient: LinearGradient(
@@ -38,13 +37,13 @@ class ReusableButton extends StatelessWidget {
       ),
       child: MaterialButton(
           height: MediaQuery.of(context).size.height*0.06,
-        minWidth: MediaQuery.of(context).size.width*0.37,
+          minWidth: MediaQuery.of(context).size.width*0.37,
           onPressed: (){
-          if(content == 'General Complaint'){
-            Navigator.pushNamed(context, GeneralComplaints.PageRoute);
-          }else{
-            Navigator.pushNamed(context, ComplaintCard.PageRoute,arguments: {'content' : content});
-          }
+            if(content == 'General Complaint'){
+
+            }else{
+              Navigator.push(context, MaterialPageRoute(builder: (context) => DashBoardAdmin(type: content,)));
+            };
             },
           color: Colors.transparent,
           shape: const RoundedRectangleBorder(

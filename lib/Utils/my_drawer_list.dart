@@ -18,7 +18,7 @@ class _MyDrawerListState extends State<MyDrawerList> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black12,
+      color: Color(0xff222222),
       padding: EdgeInsets.only(top: 15),
       child: Column(
         children: [
@@ -36,12 +36,13 @@ class _MyDrawerListState extends State<MyDrawerList> {
 
 Widget menuItem(String detail, IconData iconData){
   return Material(
+    color:Color(0xff222222),
     child: InkWell(
       child: Padding(
         padding: const EdgeInsets.all(15),
         child: Row(
           children: [
-            Expanded(child: Icon(iconData,size: 20,color: Colors.blue,)),
+            Expanded(child: Icon(iconData,size: 20,color: purplemaincolor)),
             Expanded(flex:3,child: Text(detail,style: appTextStyle(15, Colors.white, FontWeight.normal)))
           ],
         ),

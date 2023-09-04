@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hostel_connect/Provider/sense_change_provider.dart';
 import 'package:hostel_connect/Screens/Users/home_screen_user.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../../Provider/user_provider.dart';
+import '../../Utils/app_style.dart';
+import '../../Utils/colors.dart';
 import 'mycomplaints.dart';
 
 
@@ -21,7 +24,7 @@ class _StatusScreenState extends State<StatusScreen> {
 
   final firestore = FirebaseFirestore.instance;
 
-  List<dynamic> complaints = [
+  List<Map<String,List<String>>> complaints = [
 
   ];
 
@@ -30,9 +33,8 @@ class _StatusScreenState extends State<StatusScreen> {
   bool changed = true;
 
 
-  Future<List<dynamic>> getComplaints() async {
+  Future<List<Map<String,List<String>>>> getComplaints() async {
 
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String rooomNo = Provider.of<UserProvider>(context,listen:false).getRoomNo;
     String uid = Provider.of<UserProvider>(context,listen:false).getUid;
@@ -54,8 +56,6 @@ class _StatusScreenState extends State<StatusScreen> {
     complaints.clear();
 
 
-
-
     await Future.wait([
 
         subcollectionRef_rc.get().then((querySnapshot) async {
@@ -71,11 +71,11 @@ class _StatusScreenState extends State<StatusScreen> {
             String message = queryDocumentSnapshot.get('message');
             String timeAt = queryDocumentSnapshot.get('timeAt');
             String timming = queryDocumentSnapshot.get('timming');
+            String dateAt = queryDocumentSnapshot.get('dateAt');
 
-            complaints.add({'rc' : [status,message,timeAt,timming]});
 
-            await prefs.setStringList('rc_local', <String>[status,message,timeAt,timming]);
-            print(prefs.getStringList('rc_local'));
+            complaints.add({'Room Cleaning' : [status,message,dateAt,timeAt,timming]});
+
 
           } else {
             // Collection is empty or does not exist
@@ -99,10 +99,10 @@ class _StatusScreenState extends State<StatusScreen> {
         String message = queryDocumentSnapshot.get('message');
         String timeAt = queryDocumentSnapshot.get('timeAt');
         String timming = queryDocumentSnapshot.get('timming');
+        String dateAt = queryDocumentSnapshot.get('dateAt');
 
-        complaints.add({'ac' : [status,message,timeAt,timming]});
+        complaints.add({'AC Complaint' : [status,message,dateAt,timeAt,timming]});
 
-        await prefs.setStringList('ec_local', <String>[status,message,timeAt,timming]);
 
       } else {
         // Collection is empty or does not exist
@@ -127,10 +127,10 @@ class _StatusScreenState extends State<StatusScreen> {
         String message = queryDocumentSnapshot.get('message');
         String timeAt = queryDocumentSnapshot.get('timeAt');
         String timming = queryDocumentSnapshot.get('timming');
+        String dateAt = queryDocumentSnapshot.get('dateAt');
 
-        complaints.add({'ec' : [status,message,timeAt,timming]});
+        complaints.add({'Electric Complaint' : [status,message,dateAt,timeAt,timming]});
 
-        await prefs.setStringList('ec_local', <String>[status,message,timeAt,timming]);
 
 
       } else {
@@ -154,10 +154,9 @@ class _StatusScreenState extends State<StatusScreen> {
         String message = queryDocumentSnapshot.get('message');
         String timeAt = queryDocumentSnapshot.get('timeAt');
         String timming = queryDocumentSnapshot.get('timming');
+        String dateAt = queryDocumentSnapshot.get('dateAt');
 
-        complaints.add({'c' : [status,message,timeAt,timming]});
-
-        await prefs.setStringList('c_local', <String>[status,message,timeAt,timming]);
+        complaints.add({'Carpentry' : [status,message,dateAt,timeAt,timming]});
 
       } else {
         // Collection is empty or does not exist
@@ -181,10 +180,9 @@ class _StatusScreenState extends State<StatusScreen> {
           String message = queryDocumentSnapshot.get('message');
           String timeAt = queryDocumentSnapshot.get('timeAt');
           String image = queryDocumentSnapshot.get('image');
+          String dateAt = queryDocumentSnapshot.get('dateAt');
 
-          complaints.add({'gc' : [status,message,timeAt,image]});
-
-          await prefs.setStringList('g_local', <String>[status,message,timeAt,image]);
+          complaints.add({'General Complaints' : [status,message,dateAt,timeAt,image]});
 
         } else {
           // Collection is empty or does not exist
@@ -206,31 +204,7 @@ class _StatusScreenState extends State<StatusScreen> {
 
   }
 
-  getData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    changed = await Provider.of<SenseChangeProvider>(context,listen:false).getsensechange;
-
-    setState(() {
-      getrc = prefs.getStringList('rc_local');
-      getac = prefs.getStringList('ac_local');
-      getec = prefs.getStringList('ec_local');
-      getc = prefs.getStringList('c_local');
-    });
-  }
-
-
-  void makeChanges(){
-    changed = false;
-    Provider.of<SenseChangeProvider>(context,listen:false).setSenseChange();
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // getData();
-  }
 
 
 
@@ -246,102 +220,123 @@ class _StatusScreenState extends State<StatusScreen> {
         ),
       ),
       child: Scaffold(
-        appBar: AppBar(
-            title: Text('My Complaints'),
-          centerTitle: false,
-          leading: Icon(Icons.backup_table_rounded),
-          actions: [IconButton(icon: Icon(Icons.home),onPressed: (){Navigator.pushNamed(context, HomeScreenUser.PageRoute);})],
-          automaticallyImplyLeading: false,
-        ),
+        backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.grey.withOpacity(0.01),
+            leading: IconButton(
+              onPressed: (){Navigator.pop(context);},
+              icon: Icon(LineIcons.arrowLeft, color: purplemaincolor, size: 30),
+            ),
+            title: Text('status', style: appTextStyle(25, purplemaincolor, FontWeight.normal)),
+          ),
         body:
-            // changed ?
             Container(
               child: FutureBuilder(
                 future: getComplaints(),
-                builder: (context, AsyncSnapshot<List<dynamic>> snapshot){
+                builder: (context, AsyncSnapshot<List<Map<String,List<String>>>> snapshot){
                   if(snapshot.connectionState == ConnectionState.waiting){
                     return Center(child: CircularProgressIndicator(color: Colors.blue));
                   }
                   else{
-
-                    print(snapshot.data);
-                    print(snapshot.data?.length);
-
-                    // makeChanges();
-
                     return ListView.builder(
                       shrinkWrap: true,
                       itemCount: snapshot.data?.length,
                         itemBuilder: (context,int index){
-                        return GestureDetector(
-                          onTap: (){Navigator.pushNamed(context, MyComplaints.PageRoute,arguments: {'content': snapshot.data![index]});},
-                          child: ListTile(
-                            leading: Icon(Icons.ac_unit_rounded),
-                            title: Text(snapshot.data![index].toString())
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3), // changes position of shadow
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(20),
+                              color: Color(0xff373737),
+                            ),
+                            height: MediaQuery.of(context).size.height * 0.21,
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(snapshot.data![index].keys.first.toString(), style: appTextStyle(20, purplemaincolor, FontWeight.normal)),
+                                      snapshot.data![index].values.first[0].toString() == "waiting" ? Row(
+                                        children: [
+                                          Icon(LineIcons.hourglassHalf, color: Colors.red),
+                                          Text(snapshot.data![index].values.first[0].toString(), style: appTextStyle(18, Colors.red, FontWeight.normal)),
+                                        ],
+                                      )
+                                          :
+                                      snapshot.data![index].values.first[0].toString() == "progress" ? Row(
+                                        children: [
+                                          Icon(LineIcons.hourglassHalf, color: Colors.yellow),
+                                          Text(snapshot.data![index].values.first[0].toString(), style: appTextStyle(18, Colors.yellow, FontWeight.normal)),
+                                        ],
+                                      )
+                                          :
+                                      Row(
+                                        children: [
+                                          Icon(Icons.done_all, color: Colors.green),
+                                          Text(snapshot.data![index].values.first[0].toString(), style: appTextStyle(18, Colors.green, FontWeight.normal)),
+                                        ],
+                                      )
+                                    ],
+                              ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("Submitted on ", style: appTextStyle(15, Color(0xffbbbbbb), FontWeight.normal)),
+                                        Text("Completed on ", style: appTextStyle(15, Color(0xffbbbbbb), FontWeight.normal))
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(snapshot.data![index].values.first[2].toString(), style: appTextStyle(18, Colors.white, FontWeight.normal)),
+                                        Text("-")
+                                      ],
+                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(snapshot.data![index].values.first[3].toString(), style: appTextStyle(18, Colors.white, FontWeight.normal)),
+                                      Text("-")
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Message", style: appTextStyle(15, Color(0xffbbbbbb), FontWeight.normal)),
+                                      Text("Time", style: appTextStyle(15, Color(0xffbbbbbb), FontWeight.normal))
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(snapshot.data![index].values.first[1].toString(), style: appTextStyle(16, Colors.white, FontWeight.normal)),
+                                      Text(snapshot.data![index].values.first[4].toString(), style: appTextStyle(16, Colors.white, FontWeight.normal))
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
                           ),
                         );
                       }
                     );
-
-
                   }
                 },
               ),
             )
 
-          // FOR CACHE          // :
-            //   Container(
-            //
-            //   child: Center(
-            //     child: Column(
-            //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //       children: [
-            //         Card(child: Text(getrc.toString() ?? 'No Complaints')),
-            //         Card(child: Text(getac.toString() ?? 'No Complaints')),
-            //         Card(child: Text(getec.toString() ?? 'No Complaints')),
-            //         Card(child: Text(getc.toString() ?? 'No Complaints')),
-            //       ],
-            //     ),
-            //   // )
-            // )
-            // )
-
-            // Expanded(
-            //   child: ListView.builder(
-            //     itemCount: complaints.length,
-            //       itemBuilder: (context,index){
-            //         return Padding(
-            //           padding: const EdgeInsets.symmetric(vertical: 8.0),
-            //           child: ListTile(
-            //             leading: Icon(Icons.cleaning_services,color: blueColor),
-            //             title: Text(snapshot.child('type').value.toString(),style: appTextStyle(20, Colors.white, FontWeight.bold),),
-            //         subtitle: Column(
-            //         children: [
-            //         Padding(
-            //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-            //         child: Text(snapshot.child('atTime').value.toString(),style: appTextStyle(15, Colors.white, FontWeight.normal)),
-            //         ),
-            //         Padding(
-            //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-            //         child: Text(snapshot.child('message').value.toString(),style: appTextStyle(15, Colors.white, FontWeight.normal)),
-            //         ),
-            //         Text(snapshot.child('roomNo').value.toString(),style: appTextStyle(15, Colors.white, FontWeight.normal)),
-            //         Padding(
-            //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-            //         child: Text(snapshot.child('time').value.toString(),style: appTextStyle(15, Colors.white, FontWeight.normal)),
-            //         ),
-            //         Container(
-            //         child: Text(snapshot.child('status').value.toString(),style: appTextStyle(15, Colors.white, FontWeight.w700)),
-            //         color: Colors.red,
-            //         padding: EdgeInsets.all(8)
-            //         )
-            //         ],
-            //         ),
-            //         ),
-            //         );
-            //       }
-            //   )
-            // )
       ),
     );
   }
