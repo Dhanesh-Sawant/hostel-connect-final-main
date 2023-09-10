@@ -18,25 +18,8 @@ class StudentDetailsAdmin extends StatefulWidget {
 
 class _StudentDetailsAdminState extends State<StudentDetailsAdmin> {
 
-  List<String> blocks = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R'];
 
-
-
-  String? adminblock;
-
-  getAdminBlock(){
-    adminblock = Provider.of<AdminProvider>(context,listen:false).getBlock;
-  }
-
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // getAdminBlock();
-  }
-
+var blocks = [];
 
   @override
   Widget build(BuildContext context) {

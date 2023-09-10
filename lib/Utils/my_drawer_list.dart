@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hostel_connect/Screens/Admin/block_users.dart';
 import 'package:hostel_connect/Screens/Admin/login_screen_admin.dart';
 import 'package:hostel_connect/Screens/Admin/student_details_admin.dart';
 import 'package:hostel_connect/Utils/app_style.dart';
@@ -23,7 +24,7 @@ class _MyDrawerListState extends State<MyDrawerList> {
       child: Column(
         children: [
           menuItem('Dashboard',Icons.dashboard_outlined),
-          GestureDetector(child: menuItem('Student Details',Icons.school),onTap: (){Navigator.pushNamed(context, StudentDetailsAdmin.PageRoute);}),
+          GestureDetector(child: menuItem('Student Details',Icons.school),onTap: (){Navigator.pushNamed(context, BlockUsers.PageRoute);}),
           menuItem('Staff Details',Icons.work),
           menuItem('My Profile',Icons.account_circle),
           GestureDetector(child: menuItem('logout',Icons.logout),onTap: (){AuthMethods().SignOut();

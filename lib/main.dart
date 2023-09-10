@@ -77,7 +77,7 @@ class MyApp extends StatelessWidget {
           GeneralComplaints.PageRoute : (context) => GeneralComplaints(),
           OtpVerification.PageRoute : (context) => OtpVerification(),
           MyComplaints.PageRoute : (context) => MyComplaints(),
-          LayoutScreen.PageRoute : (context) => LayoutScreen(),
+          // LayoutScreen.PageRoute : (context) => LayoutScreen(),
           OtpScreen.PageRoute : (context) => OtpScreen(),
         },
 

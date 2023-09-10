@@ -195,23 +195,24 @@ class _LoginScreenUserState extends State<LoginScreenUser> {
                             color: purplemaincolor,
                               onPressed: () async {
 
-
-
-
-
-
                                   setState(() {
                                     isLoading = true;
                                   });
 
-                                  String result = await sendOTP();
+                                  // String result = await sendOTP();
+
+                                  String result = await AuthMethods().LogIn(
+                                      username: _emailEditingController.text,
+                                      password: "100000"
+                                  );
 
                                   setState(() {
                                     isLoading = false;
                                   });
 
-                                  if(result=='success'){
-                                    Navigator.pushNamed(context,OtpScreen.PageRoute, arguments: {'OTP': OTP});
+                                  if(result=='user'){
+                                    // Navigator.pushNamed(context,OtpScreen.PageRoute, arguments: {'OTP': OTP});
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => LayoutScreen(pageset: 0)));
                                   }
                                   else{
                                     showSnackBar(result, context);

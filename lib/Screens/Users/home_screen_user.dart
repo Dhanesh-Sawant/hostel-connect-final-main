@@ -12,6 +12,8 @@ import '../../Models/Users.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:shimmer/shimmer.dart';
 
+import 'layout_screen.dart';
+
 
 class HomeScreenUser extends StatefulWidget {
   const HomeScreenUser({Key? key}) : super(key: key);
@@ -62,36 +64,13 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
 
 
     await Future.wait([
-      Provider.of<StatusProvider>(context,listen: false).refreshComplaintStatus(uid!,RN!)
+      Provider.of<StatusProvider>(context,listen: false).refreshComplaintStatus(user)
     ]);
 
     return username;
   }
 
   Future<List<String>> refreshstatus()async{
-
-    // Map<String,List<String>> status = {};
-    //
-    // print("inside refreshstatus");
-    //
-    // rc = Provider.of<StatusProvider>(context,listen: false).getStatus_RC;
-    // ac = Provider.of<StatusProvider>(context,listen: false).getStatus_AC;
-    // ec = Provider.of<StatusProvider>(context,listen: false).getStatus_EC;
-    // c = Provider.of<StatusProvider>(context,listen: false).getStatus_C;
-    //
-    // status['RC'] = rc!;
-    // status['AC'] = ac!;
-    // status['EC'] = ec!;
-    // status['C'] = c!;
-    //
-    // print("printing from refreshstatus()");
-    // print('$rc $ac $ec $c');
-    //
-    // print("ended refreshstatus");
-
-    // await Future.wait([
-    //   Future.delayed(Duration(seconds: 10))
-    // ]);
 
 
     String tempwaiting = await Provider.of<StatusProvider>(context,listen: false).getLatestWaiting ?? "No complaints";
@@ -179,7 +158,7 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
           padding: const EdgeInsets.only(top: 30, bottom: 20),
           child: GestureDetector(
             onTap: (){
-              Navigator.pushNamed(context, StatusScreen.PageRoute);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => LayoutScreen(pageset: 1)));
             },
             child: Container(
               decoration: BoxDecoration(
@@ -218,10 +197,21 @@ class _HomeScreenUserState extends State<HomeScreenUser> {
 
                             return Column(
                                 children: [
-
-                                  snapshot.data![1] != "No complaints" ? Text(snapshot.data![1], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500))
+                                  snapshot.data![1] != "No complaints" ? Row(
+                                    children: [
+                                      Text(snapshot.data![1], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
+                                      Expanded(child: Container()),
+                                      Text("progress", style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500))
+                                    ],
+                                  )
                                     :
-                                      Text(snapshot.data![0], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
+                                      Row(
+                                        children: [
+                                          Text(snapshot.data![0], style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500)),
+                                          Expanded(child: Container()),
+                                          Text("waiting", style: appTextStyle(18.0, Color(0xffb4e2f1), FontWeight.w500))
+                                        ],
+                                      ),
 
                                 ]
                             );

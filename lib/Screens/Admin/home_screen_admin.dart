@@ -75,6 +75,7 @@ class _HomeScreenAdminState extends State<HomeScreenAdmin> {
     setInitData();
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +88,8 @@ class _HomeScreenAdminState extends State<HomeScreenAdmin> {
           ),
         ),
         child: Scaffold(
+          key: _scaffoldKey,
+          // appBar: AppBar(),
             backgroundColor: Colors.transparent,
             body: SafeArea(
                 child: Padding(
@@ -105,7 +108,25 @@ class _HomeScreenAdminState extends State<HomeScreenAdmin> {
                         }
                       }
                   ),
-                )))
+                )),
+          drawer: Drawer(
+            child: Container(
+              color: Color(0xff222222),
+              child: Column(
+                children: [
+                  MyHeaderDrawer(),
+                  MyDrawerList(),
+                  // Expanded(child: Container(child: Text("hi"),)),
+                  // Container(
+                  //   child: Text("hello"),
+                  //   height: double.infinity,
+                  //   color: Color(0xff222222)
+                  // )
+                ],
+              ),
+            ),
+          ),
+        )
     );
   }
 
@@ -114,6 +135,13 @@ class _HomeScreenAdminState extends State<HomeScreenAdmin> {
       children: [
         Row(
           children: [
+            GestureDetector(
+              onTap: () {
+                _scaffoldKey.currentState!.openDrawer();
+              },
+              child: Icon(Icons.menu, color: Colors.white.withOpacity(0.9), size: 30),
+            ),
+            SizedBox(width: 10),
             Text('Hi $UN', style: appTextStyle(28.0, Colors.white, FontWeight.w500)),
             Expanded(child: Container()),
             IconButton(
@@ -192,22 +220,6 @@ class _HomeScreenAdminState extends State<HomeScreenAdmin> {
 // ),
 // )
 // ),
-// drawer: Drawer(
-// child: Container(
-// color: Color(0xff222222),
-// child: Column(
-// children: [
-// MyHeaderDrawer(),
-// MyDrawerList(),
-// // Expanded(child: Container(child: Text("hi"),))
-// // Container(
-// //   child: Text("hello"),
-// //   height: double.infinity,
-// //   color: Color(0xff222222),
-// // )
-// ],
-// ),
-// ),
-// ),
+
 // );
 //

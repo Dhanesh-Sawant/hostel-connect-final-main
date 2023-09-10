@@ -11,6 +11,7 @@ import '../../Provider/user_provider.dart';
 import '../../Resources/storage_methods.dart';
 import '../../Models/Users.dart' as model;
 import '../../Utils/show_snackbar.dart';
+import 'layout_screen.dart';
 
 class ComplaintCard extends StatefulWidget {
   @override
@@ -208,7 +209,7 @@ class _ComplaintCardState extends State<ComplaintCard> {
                             }
                             else{
                               Provider.of<SenseChangeProvider>(context,listen:false).setSenseChange();
-                              Navigator.pushNamed(context, StatusScreen.PageRoute,arguments: {'user' : user, 'type' : type});
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => LayoutScreen(pageset: 1)));
                             }
 
 

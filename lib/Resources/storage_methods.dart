@@ -26,7 +26,7 @@ class StorageMethods{
     
     try{
 
-      DocumentReference<Map<String, dynamic>> ref = await firebaseFirestore.collection('Complaints').doc(type);
+      DocumentReference<Map<String, dynamic>> ref = await firebaseFirestore.collection('Complaints').doc(type).collection(user.block).doc('waiting');
 
       // DocumentSnapshot<Map<String,dynamic>> snapshot = await ref.get();
 
@@ -38,7 +38,7 @@ class StorageMethods{
         result = "already processing request for this room";
       }
       else{
-        firebaseFirestore.collection('Complaints').doc(type).collection(user.roomNo).doc(user.uid).set(
+        firebaseFirestore.collection('Complaints').doc(type).collection(user.block).doc('waiting').collection(user.roomNo).doc(user.uid).set(
             {
               "message" : message,
               "status" : "waiting",

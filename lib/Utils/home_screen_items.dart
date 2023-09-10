@@ -9,5 +9,4 @@ List<Widget> homeScreenItems = [
   HomeScreenUser(),
   StatusScreen(),
   ProfileScreen()
-
 ];

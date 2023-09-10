@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:hostel_connect/Provider/sense_change_provider.dart';
-import 'package:hostel_connect/Screens/Users/home_screen_user.dart';
+
 import 'package:line_icons/line_icons.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:provider/provider.dart';
+import '../../Models/Users.dart';
 import '../../Provider/user_provider.dart';
 import '../../Utils/app_style.dart';
 import '../../Utils/colors.dart';
-import 'mycomplaints.dart';
+
 
 
 class StatusScreen extends StatefulWidget {
@@ -36,168 +36,165 @@ class _StatusScreenState extends State<StatusScreen> {
   Future<List<Map<String,List<String>>>> getComplaints() async {
 
 
-    String rooomNo = Provider.of<UserProvider>(context,listen:false).getRoomNo;
-    String uid = Provider.of<UserProvider>(context,listen:false).getUid;
-
-    CollectionReference collectionRef = firestore.collection('Complaints');
-
-    DocumentReference documentRef_rc = collectionRef.doc('Room Cleaning');
-    DocumentReference documentRef_ac = collectionRef.doc('AC complaint');
-    DocumentReference documentRef_ec = collectionRef.doc('Electric Complaint');
-    DocumentReference documentRef_c = collectionRef.doc('Carpentry');
-    DocumentReference documentRef_g = collectionRef.doc('General Complaints');
-
-    final CollectionReference subcollectionRef_rc = documentRef_rc.collection(rooomNo);
-    final CollectionReference subcollectionRef_ac = documentRef_ac.collection(rooomNo);
-    final CollectionReference subcollectionRef_ec = documentRef_ec.collection(rooomNo);
-    final CollectionReference subcollectionRef_c = documentRef_c.collection(rooomNo);
-    final CollectionReference subcollectionRef_gc = documentRef_g.collection(uid);
+    User user = Provider.of<UserProvider>(context,listen:false).getUser;
 
     complaints.clear();
 
 
-    await Future.wait([
 
-        subcollectionRef_rc.get().then((querySnapshot) async {
-          if (querySnapshot.docs.isNotEmpty) {
-            // Collection exists and has documents
-            // print("Collection exists");
+    DocumentSnapshot<Map<String, dynamic>> RC_W_snapshot = await firestore.collection('Complaints').doc('Room Cleaning').collection(user.block).doc('waiting').collection(user.roomNo).doc(user.uid).get();
 
-            QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
+    if(RC_W_snapshot.exists) {
+      String status = RC_W_snapshot.data()?['status'];
+      String message = RC_W_snapshot.data()?['message'];
+      String timeAt = RC_W_snapshot.data()?['timeAt'];
+      String timming = RC_W_snapshot.data()?['timming'];
+      String dateAt = RC_W_snapshot.data()?['dateAt'];
 
-            print(queryDocumentSnapshot.get('status'));
+      complaints.add({'Room Cleaning' : [status,message,dateAt,timeAt,timming]});
+    }
 
-            String status = queryDocumentSnapshot.get('status');
-            String message = queryDocumentSnapshot.get('message');
-            String timeAt = queryDocumentSnapshot.get('timeAt');
-            String timming = queryDocumentSnapshot.get('timming');
-            String dateAt = queryDocumentSnapshot.get('dateAt');
+    DocumentSnapshot<Map<String, dynamic>> RC_P_snapshot = await firestore.collection('Complaints').doc('Room Cleaning').collection(user.block).doc('progress').collection(user.roomNo).doc(user.uid).get();
 
+    if(RC_P_snapshot.exists) {
+      String status = RC_P_snapshot.data()?['status'];
+      String message = RC_P_snapshot.data()?['message'];
+      String timeAt = RC_P_snapshot.data()?['timeAt'];
+      String timming = RC_P_snapshot.data()?['timming'];
+      String dateAt = RC_P_snapshot.data()?['dateAt'];
 
-            complaints.add({'Room Cleaning' : [status,message,dateAt,timeAt,timming]});
-
-
-          } else {
-            // Collection is empty or does not exist
-            print("Collection does not exist");
-          }
-        }).catchError((error) {
-          print("Error checking collection existence: $error");
-        }),
-
-        subcollectionRef_ac.get().then((querySnapshot) async {
-      if (querySnapshot.docs.isNotEmpty) {
-        // Collection exists and has documents
-        // print("Collection exists");
-
-
-        QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
-
-        print(queryDocumentSnapshot.get('status'));
-
-        String status = queryDocumentSnapshot.get('status');
-        String message = queryDocumentSnapshot.get('message');
-        String timeAt = queryDocumentSnapshot.get('timeAt');
-        String timming = queryDocumentSnapshot.get('timming');
-        String dateAt = queryDocumentSnapshot.get('dateAt');
-
-        complaints.add({'AC Complaint' : [status,message,dateAt,timeAt,timming]});
-
-
-      } else {
-        // Collection is empty or does not exist
-        print("Collection does not exist");
-      }
-    }).catchError((error) {
-      print("Error checking collection existence: $error");
-    }),
+      complaints.add({'Room Cleaning' : [status,message,dateAt,timeAt,timming]});
+    }
 
 
 
-    subcollectionRef_ec.get().then((querySnapshot) async {
-      if (querySnapshot.docs.isNotEmpty) {
-        // Collection exists and has documents
-        // print("Collection exists");
 
-        QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
+    DocumentSnapshot<Map<String, dynamic>> RC_C_snapshot = await firestore.collection('Complaints').doc('Room Cleaning').collection(user.block).doc('completed').collection(user.roomNo).doc(user.uid).get();
 
-        print(queryDocumentSnapshot.get('status'));
+    if(RC_C_snapshot.exists) {
+      String status = RC_C_snapshot.data()?['status'];
+      String message = RC_C_snapshot.data()?['message'];
+      String timeAt = RC_C_snapshot.data()?['timeAt'];
+      String timming = RC_C_snapshot.data()?['timming'];
+      String dateAt = RC_C_snapshot.data()?['dateAt'];
 
-        String status = queryDocumentSnapshot.get('status');
-        String message = queryDocumentSnapshot.get('message');
-        String timeAt = queryDocumentSnapshot.get('timeAt');
-        String timming = queryDocumentSnapshot.get('timming');
-        String dateAt = queryDocumentSnapshot.get('dateAt');
-
-        complaints.add({'Electric Complaint' : [status,message,dateAt,timeAt,timming]});
+      complaints.add({'Room Cleaning' : [status,message,dateAt,timeAt,timming]});
+    }
 
 
+    DocumentSnapshot<Map<String, dynamic>> AC_W_snapshot = await firestore.collection('Complaints').doc('AC complaint').collection(user.block).doc('waiting').collection(user.roomNo).doc(user.uid).get();
 
-      } else {
-        // Collection is empty or does not exist
-        print("Collection does not exist");
-      }
-    }).catchError((error) {
-      print("Error checking collection existence: $error");
-    }),
+    if(AC_W_snapshot.exists) {
+      String status = AC_W_snapshot.data()?['status'];
+      String message = AC_W_snapshot.data()?['message'];
+      String timeAt = AC_W_snapshot.data()?['timeAt'];
+      String timming = AC_W_snapshot.data()?['timming'];
+      String dateAt = AC_W_snapshot.data()?['dateAt'];
 
-    subcollectionRef_c.get().then((querySnapshot) async {
-      if (querySnapshot.docs.isNotEmpty) {
-        // Collection exists and has documents
-        // print("Collection exists");
+      complaints.add({'AC complaint' : [status,message,dateAt,timeAt,timming]});
+    }
 
-        QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
+    DocumentSnapshot<Map<String, dynamic>> AC_A_snapshot = await firestore.collection('Complaints').doc('AC complaint').collection(user.block).doc('progress').collection(user.roomNo).doc(user.uid).get();
 
-        print(queryDocumentSnapshot.get('status'));
+    if(AC_A_snapshot.exists) {
+      String status = AC_A_snapshot.data()?['status'];
+      String message = AC_A_snapshot.data()?['message'];
+      String timeAt = AC_A_snapshot.data()?['timeAt'];
+      String timming = AC_A_snapshot.data()?['timming'];
+      String dateAt = AC_A_snapshot.data()?['dateAt'];
 
-        String status = queryDocumentSnapshot.get('status');
-        String message = queryDocumentSnapshot.get('message');
-        String timeAt = queryDocumentSnapshot.get('timeAt');
-        String timming = queryDocumentSnapshot.get('timming');
-        String dateAt = queryDocumentSnapshot.get('dateAt');
+      complaints.add({'AC complaint' : [status,message,dateAt,timeAt,timming]});
+    }
 
-        complaints.add({'Carpentry' : [status,message,dateAt,timeAt,timming]});
 
-      } else {
-        // Collection is empty or does not exist
-        print("Collection does not exist");
-      }
+    DocumentSnapshot<Map<String, dynamic>> AC_C_snapshot = await firestore.collection('Complaints').doc('AC complaint').collection(user.block).doc('completed').collection(user.roomNo).doc(user.uid).get();
 
-    }).catchError((error) {
-      print("Error checking collection existence: $error");
-    }),
+    if(AC_C_snapshot.exists) {
+      String status = AC_C_snapshot.data()?['status'];
+      String message = AC_C_snapshot.data()?['message'];
+      String timeAt = AC_C_snapshot.data()?['timeAt'];
+      String timming = AC_C_snapshot.data()?['timming'];
+      String dateAt = AC_C_snapshot.data()?['dateAt'];
 
-      subcollectionRef_gc.get().then((querySnapshot) async {
-        if (querySnapshot.docs.isNotEmpty) {
-          // Collection exists and has documents
-          // print("Collection exists");
+      complaints.add({'AC complaint' : [status,message,dateAt,timeAt,timming]});
+    }
 
-          QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
 
-          print(queryDocumentSnapshot.get('status'));
+    DocumentSnapshot<Map<String, dynamic>> EC_W_snapshot = await firestore.collection('Complaints').doc('Electric Complaint').collection(user.block).doc('waiting').collection(user.roomNo).doc(user.uid).get();
 
-          String status = queryDocumentSnapshot.get('status');
-          String message = queryDocumentSnapshot.get('message');
-          String timeAt = queryDocumentSnapshot.get('timeAt');
-          String image = queryDocumentSnapshot.get('image');
-          String dateAt = queryDocumentSnapshot.get('dateAt');
+    if(EC_W_snapshot.exists) {
+      String status = EC_W_snapshot.data()?['status'];
+      String message = EC_W_snapshot.data()?['message'];
+      String timeAt = EC_W_snapshot.data()?['timeAt'];
+      String timming = EC_W_snapshot.data()?['timming'];
+      String dateAt = EC_W_snapshot.data()?['dateAt'];
 
-          complaints.add({'General Complaints' : [status,message,dateAt,timeAt,image]});
+      complaints.add({'Electric Complaint' : [status,message,dateAt,timeAt,timming]});
+    }
 
-        } else {
-          // Collection is empty or does not exist
-          print("Collection does not exist");
-        }
+    DocumentSnapshot<Map<String, dynamic>> EC_A_snapshot = await firestore.collection('Complaints').doc('Electric Complaint').collection(user.block).doc('progress').collection(user.roomNo).doc(user.uid).get();
 
-      }).catchError((error) {
-        print("Error checking collection existence: $error");
-      }),
+    if(EC_A_snapshot.exists) {
+      String status = EC_A_snapshot.data()?['status'];
+      String message = EC_A_snapshot.data()?['message'];
+      String timeAt = EC_A_snapshot.data()?['timeAt'];
+      String timming = EC_A_snapshot.data()?['timming'];
+      String dateAt = EC_A_snapshot.data()?['dateAt'];
 
-    ]
-    );
-    
+      complaints.add({'Electric Complaint' : [status,message,dateAt,timeAt,timming]});
+    }
 
-    // await Future.delayed(Duration(seconds: 10));
+    DocumentSnapshot<Map<String, dynamic>> EC_C_snapshot = await firestore.collection('Complaints').doc('Electric Complaint').collection(user.block).doc('completed').collection(user.roomNo).doc(user.uid).get();
+
+    if(EC_C_snapshot.exists) {
+      String status = EC_C_snapshot.data()?['status'];
+      String message = EC_C_snapshot.data()?['message'];
+      String timeAt = EC_C_snapshot.data()?['timeAt'];
+      String timming = EC_C_snapshot.data()?['timming'];
+      String dateAt = EC_C_snapshot.data()?['dateAt'];
+
+      complaints.add({'Electric Complaint' : [status,message,dateAt,timeAt,timming]});
+    }
+
+
+    DocumentSnapshot<Map<String, dynamic>> C_W_snapshot = await firestore.collection('Complaints').doc('Carpentry').collection(user.block).doc('waiting').collection(user.roomNo).doc(user.uid).get();
+
+    if(C_W_snapshot.exists) {
+      String status = C_W_snapshot.data()?['status'];
+      String message = C_W_snapshot.data()?['message'];
+      String timeAt = C_W_snapshot.data()?['timeAt'];
+      String timming = C_W_snapshot.data()?['timming'];
+      String dateAt = C_W_snapshot.data()?['dateAt'];
+
+      complaints.add({'Carpentry' : [status,message,dateAt,timeAt,timming]});
+    }
+
+
+    DocumentSnapshot<Map<String, dynamic>> C_A_snapshot = await firestore.collection('Complaints').doc('Carpentry').collection(user.block).doc('progress').collection(user.roomNo).doc(user.uid).get();
+
+    if(C_A_snapshot.exists) {
+      String status = C_A_snapshot.data()?['status'];
+      String message = C_A_snapshot.data()?['message'];
+      String timeAt = C_A_snapshot.data()?['timeAt'];
+      String timming = C_A_snapshot.data()?['timming'];
+      String dateAt = C_A_snapshot.data()?['dateAt'];
+
+      complaints.add({'Carpentry' : [status,message,dateAt,timeAt,timming]});
+    }
+
+
+    DocumentSnapshot<Map<String, dynamic>> C_C_snapshot = await firestore.collection('Complaints').doc('Carpentry').collection(user.block).doc('completed').collection(user.roomNo).doc(user.uid).get();
+
+    if(C_C_snapshot.exists) {
+      String status = C_C_snapshot.data()?['status'];
+      String message = C_C_snapshot.data()?['message'];
+      String timeAt = C_C_snapshot.data()?['timeAt'];
+      String timming = C_C_snapshot.data()?['timming'];
+      String dateAt = C_C_snapshot.data()?['dateAt'];
+
+      complaints.add({'Carpentry' : [status,message,dateAt,timeAt,timming]});
+    }
+
 
     print(complaints);
     return complaints;
@@ -222,12 +219,9 @@ class _StatusScreenState extends State<StatusScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             elevation: 0,
             backgroundColor: Colors.grey.withOpacity(0.01),
-            leading: IconButton(
-              onPressed: (){Navigator.pop(context);},
-              icon: Icon(LineIcons.arrowLeft, color: purplemaincolor, size: 30),
-            ),
             title: Text('status', style: appTextStyle(25, purplemaincolor, FontWeight.normal)),
           ),
         body:

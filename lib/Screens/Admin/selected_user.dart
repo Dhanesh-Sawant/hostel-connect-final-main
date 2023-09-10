@@ -17,44 +17,13 @@ class SelectedUser extends StatefulWidget {
 
 class _SelectedUserState extends State<SelectedUser> {
 
-  String username = " ";
-  String block = " ";
-  String roomNo = " ";
 
-
-  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-
-  getSelectedUserDetails(String uid) async {
-    DocumentSnapshot<Map<String, dynamic>> snapshot = await _firebaseFirestore.collection('Users').doc(uid).get();
-
-    // print(snapshot.data());
-
-    setState(() {
-      username = snapshot.data()?['username'];
-      block = snapshot.data()?['block'];
-      roomNo = snapshot.data()?['roomNo'];
-
-      // print("printing the data");
-      // print('$username, $block, $roomNo');
-
-    });
-  }
-
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
 
     final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
 
-    setState(() {
-      getSelectedUserDetails(arguments['uid']);
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -76,10 +45,10 @@ class _SelectedUserState extends State<SelectedUser> {
                     backgroundImage: NetworkImage('https://th.bing.com/th/id/OIP.Yw4exB-_crv1xcdLRQ6hngHaHx?pid=ImgDet&rs=1'),
                   ),
                 ),
-                Text('uid: ${arguments['uid']}',style: appTextStyle(15, Colors.white, FontWeight.normal)),
-                Text('username: $username',style: appTextStyle(20, Colors.white, FontWeight.normal)),
-                Text('block: $block',style: appTextStyle(20, Colors.white, FontWeight.normal)),
-                Text('roomNo: $roomNo',style: appTextStyle(20, Colors.white, FontWeight.normal)),
+                Text('uid: ${arguments['user']['uid']}',style: appTextStyle(15, Colors.white, FontWeight.normal)),
+                Text('username: ${arguments['user']['username']}',style: appTextStyle(20, Colors.white, FontWeight.normal)),
+                Text('block: ${arguments['user']['block']}',style: appTextStyle(20, Colors.white, FontWeight.normal)),
+                Text('roomNo: ${arguments['user']['roomNo']}',style: appTextStyle(20, Colors.white, FontWeight.normal)),
                 SizedBox(height: 40),
                 MaterialButton(
                     onPressed: (){

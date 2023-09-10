@@ -13,7 +13,8 @@ class AuthMethods{
 
   Future<usermodel.User> getUserDetails() async {
     User currentuser = _auth.currentUser!;
-    DocumentSnapshot snapshot = await _firestore.collection('Users').doc(currentuser.uid).get();
+    String temp = "test" + currentuser.uid;
+    DocumentSnapshot snapshot = await _firestore.collection('UserCheck').doc(temp).get();
     return usermodel.User.fromSnap(snapshot);
   }
 
@@ -93,11 +94,11 @@ class AuthMethods{
     try{
 
       if(username.isNotEmpty && password.isNotEmpty){
-
+        String test = username;
         username = username + "@gmail.com";
         UserCredential cred = await _auth.signInWithEmailAndPassword(email: username, password: password);
 
-        DocumentSnapshot snapshot = await _firestore.collection('Users').doc(cred.user!.uid).get();
+        DocumentSnapshot snapshot = await _firestore.collection('UserCheck').doc(test).get();
         if(snapshot.data() == null){
           result = "admin";
         }

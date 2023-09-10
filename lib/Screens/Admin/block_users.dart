@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hostel_connect/Screens/Admin/selected_user.dart';
+import 'package:provider/provider.dart';
 
+import '../../Provider/admin_provider.dart';
 import '../../Utils/colors.dart';
 import 'home_screen_admin.dart';
 
@@ -20,45 +22,77 @@ class _BlockUsersState extends State<BlockUsers> {
   FirebaseDatabase database = FirebaseDatabase.instance;
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  List<String> blockusers  = [];
+  List<Map<String,dynamic>> blockusers  = [];
 
   Map<String,String> userNameID = {};
 
+  String? adminblock;
 
-  Future<List<String>> getBlockUsers(String block) async {
+  Future<List<Map<String,dynamic>>> getBlockUsers() async {
 
     blockusers.clear();
 
-    QuerySnapshot<Map<String,dynamic>> result = await _firebaseFirestore.collection('Users').get();
-    List<QueryDocumentSnapshot<Map<String,dynamic>>> documents = result.docs;
+    DocumentSnapshot<Map<String, dynamic>> result = await _firebaseFirestore.collection('Users').doc(adminblock).get();
+
+    print(result.data());
+    int blockUsers = result.data()?.length ?? 0;
+
+      result.data()?.forEach((key, value) {
+        blockusers.add(value);
+      });
 
 
-    documents.forEach((element) {
-      if(element.data()['block'] == block){
-
-        blockusers.add(element.data()['username']);
-        userNameID.addAll({element.data()['username']:element.data()['uid']});
-      }
-    });
+    // documents.forEach((element) {
+    //   if(element.data()['block'] == block){
+    //
+    //     blockusers.add(element.data()['username']);
+    //     userNameID.addAll({element.data()['username']:element.data()['uid']});
+    //   }
+    // });
 
     print(blockusers);
-
     return blockusers;
 
   }
+
+
+  List<String> blocks = [
+    'ALBERT EINSTEIN BLOCK - A',
+    'CHARLES DARWIN BLOCK - N',
+    'RAMANUJAM BLOCK - F',
+    'R BLOCK - R',
+    'NELSON MANDELA BLOCK ANNEXE - D ANNEX',
+    'QUAID -E- MILLAT MUHAMMED ISMAIL BLOCK - M',
+    'JOHN F KENNEDY BLOCK- J - J',
+    'JOHN F KENNEDY BLOCK - H - H',
+    'SOCRATES BLOCK - G',
+    'SWAMI VIVEKANANDA BLOCK ANNEXE - B ANNEX',
+    'SARDAR PATEL BLOCK - P',
+    'NELSON MANDELA BLOCK - D',
+    'RABINDRANATH TAGORE BLOCK - C',
+    'VAJPAYEE BLOCK - Q',
+    'Dr. SARVEPALLI RADHAKRISHNAN BLOCK - K',
+    'SWAMI VIVEKANANDA BLOCK - B',
+    'Sir. C.V. RAMAN BLOCK - E',
+    "NETAJI SUBHAS CHANDRA BOSE BLOCK - L"
+  ];
+
+
+  getAdminBlock(){
+    adminblock =  Provider.of<AdminProvider>(context,listen:false).getBlock;
+  }
+
 
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    getAdminBlock();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
 
     return Scaffold(
       appBar: AppBar(
@@ -69,9 +103,9 @@ class _BlockUsersState extends State<BlockUsers> {
         ],
       ),
       body: Container(
-        child: FutureBuilder(
-            future: getBlockUsers(arguments['block']),
-            builder: (context, AsyncSnapshot<List<String>> snapshot){
+        child: FutureBuilder<List<Map<String,dynamic>>>(
+            future: getBlockUsers(),
+            builder: (context,snapshot){
               if(snapshot.connectionState == ConnectionState.waiting){
                 return CircularProgressIndicator(color: blueColor);
               }
@@ -80,9 +114,15 @@ class _BlockUsersState extends State<BlockUsers> {
                     itemCount: snapshot.data?.length,
                     itemBuilder: (context,index){
                       return ListTile(
-                          title: Text(snapshot.data![index]),
+                          title: Row(
+                            children: [
+                              Text(snapshot.data![index]['username']),
+                              SizedBox(width: 10),
+                              Text(snapshot.data![index]['roomNo']),
+                            ],
+                          ),
                         onTap: (){
-                            Navigator.pushNamed(context, SelectedUser.PageRoute, arguments: {'uid': userNameID[snapshot.data![index]]});
+                          Navigator.pushNamed(context, SelectedUser.PageRoute, arguments: {'user': snapshot.data![index]});
                         },
                       );
                     }

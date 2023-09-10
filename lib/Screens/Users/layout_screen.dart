@@ -5,9 +5,11 @@ import '../../Utils/colors.dart';
 import '../../Utils/home_screen_items.dart';
 
 class LayoutScreen extends StatefulWidget {
-  const LayoutScreen({Key? key}) : super(key: key);
+  const LayoutScreen({Key? key, required this.pageset}) : super(key: key);
 
   static String PageRoute = 'LayoutScreen';
+
+  final int pageset;
 
   @override
   State<LayoutScreen> createState() => _LayoutScreenState();
@@ -35,7 +37,8 @@ class _LayoutScreenState extends State<LayoutScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    pageController = PageController(initialPage: 0);
+    pageController = PageController(initialPage: widget.pageset);
+    _pageNo = widget.pageset;
   }
 
   @override
@@ -48,22 +51,21 @@ class _LayoutScreenState extends State<LayoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: PageView(// pageview is what we see after we change by pagecontroller and it is indexed
-          children: homeScreenItems,
-          controller: pageController,
-          onPageChanged: onpageChanged,
-          physics: NeverScrollableScrollPhysics(), // to disable pageview by swiping left and right
-          // onPageChanged: onPageChanged,
-        ),
+      body: PageView(
+        // pageview is what we see after we change by pagecontroller and it is indexed
+        children: homeScreenItems,
+        controller: pageController,
+        onPageChanged: onpageChanged,
+        physics: NeverScrollableScrollPhysics(), // to disable pageview by swiping left and right
+        // onPageChanged: onPageChanged,
       ),
       bottomNavigationBar: CupertinoTabBar(
-        backgroundColor: mobileBackgroundColor,
+        backgroundColor: Colors.grey.withOpacity(0.06),
         items: [
           BottomNavigationBarItem(
             icon: Icon(
               Icons.home_filled,
-              color: _pageNo==0 ? primaryColor : secondaryColor,
+              color: _pageNo==0 ? purplemaincolor : secondaryColor,
             ),
             label: '',
             backgroundColor: primaryColor,
@@ -71,7 +73,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.work,
-              color: _pageNo==1 ? primaryColor : secondaryColor,
+              color: _pageNo==1 ? purplemaincolor : secondaryColor,
             ),
             label: '',
             backgroundColor: primaryColor,
@@ -79,7 +81,7 @@ class _LayoutScreenState extends State<LayoutScreen> {
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
-              color: _pageNo==3 ? primaryColor : secondaryColor,
+              color: _pageNo==2 ? purplemaincolor : secondaryColor,
             ),
             label: '',
             backgroundColor: primaryColor,

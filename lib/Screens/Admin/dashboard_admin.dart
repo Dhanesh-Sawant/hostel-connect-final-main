@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hostel_connect/Utils/app_style.dart';
 import 'package:provider/provider.dart';
@@ -24,18 +23,19 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
 
   int waiting=0;
   int progress=0;
+  int completed=0;
 
   List<String> blockuserroomNo = [];
 
   List<TableData> tableDataListWaiting = [];
   List<TableData> tableDataListProgress = [];
+  List<TableData> tableDataListCompleted = [];
 
-  getMyBlockuserRoomNo() async {
-
-      blockuserroomNo = Provider.of<BlockUsersProvider>(context,listen: false).getuserRoomNo!;
+  Future<void> getMyBlockuserRoomNo() async {
+      blockuserroomNo = await Provider.of<BlockUsersProvider>(context,listen: false).getuserRoomNo!;
   }
 
-  getWP() async {
+  Future<void> getWP() async {
 
       CollectionReference collectionRef = firestore.collection('Complaints');
 
@@ -57,6 +57,7 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
 
       List<Future<void>> fetchFutures = [];
 
+      print(blockuserroomNo.length);
 
         for(int i =0; i<blockuserroomNo.length; i++){
 
@@ -65,9 +66,12 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
 
           fetchFutures.add(
               subcollectionRef.get().then((querySnapshot) {
+                print("collection exists");
                 if (querySnapshot.docs.isNotEmpty) {
                   // Collection exists and has documents
                   // print("Collection exists");
+
+                  print("collection exists");
 
                   QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.docs.first;
 
@@ -81,18 +85,6 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
 
                   print(queryDocumentSnapshot.get('status'));
 
-                  if(queryDocumentSnapshot.get('status')=="waiting"){
-                    print("inside waiting");
-                    setState(() {
-                      waiting++;
-                    });
-                  }
-
-                  if(queryDocumentSnapshot.get('status')=="progress"){
-                    setState(() {
-                      progress++;
-                    });
-                  }
 
                   TableData tableData = TableData(
                       roomNo: roomNo,
@@ -105,9 +97,27 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
 
                   if(queryDocumentSnapshot.get('status') == "waiting"){
                     tableDataListWaiting.add(tableData);
+                    setState(() {
+                      waiting++;
+                    });
+                    print("added");
                   }
                   else{
-                    tableDataListProgress.add(tableData);
+                    if(queryDocumentSnapshot.get('status') == "progress"){
+                      setState(() {
+                        progress++;
+                      });
+                      tableDataListProgress.add(tableData);
+                      print("added");
+                    }
+                    else{
+                      setState(() {
+                        completed++;
+                      });
+                      tableDataListCompleted.add(tableData);
+                      print("added");
+                    }
+
                   }
 
                 } else {
@@ -125,8 +135,8 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
         await Future.wait(fetchFutures);
         print(blockuserroomNo);
         //
-        // print("waiting: $waiting");
-        // print("progress: $progress");
+        print("waiting: $waiting");
+        print("progress: $progress");
 
 
   }
@@ -139,16 +149,32 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
     return tableDataListProgress;
   }
 
+  Future<List<TableData>> fetchCompletedTableData() async {
+    return tableDataListCompleted;
+  }
+
+  setInitData() async {
+
+    await Future.wait([
+    getMyBlockuserRoomNo()
+    ]);
+    print("got the block users");
+
+    await Future.wait([
+    getWP()
+    ]);
+    print("got waiting, progress and completed");
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getMyBlockuserRoomNo();
-    getWP();
+    setInitData();
   }
 
   late final TabController _tabController = TabController(
-      length: 2, vsync: this
+      length: 3, vsync: this
   );
 
 
@@ -169,7 +195,7 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
               children: [
                 Text("Waiting : $waiting",style: appTextStyle(15, Colors.white, FontWeight.bold)),
                 Text("Progress : $progress",style: appTextStyle(15, Colors.white, FontWeight.bold)),
-                Text("Completed : 0",style: appTextStyle(15, Colors.white, FontWeight.bold))
+                Text("Completed : $completed",style: appTextStyle(15, Colors.white, FontWeight.bold))
               ],
             ),
           ),
@@ -177,6 +203,7 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
             tabs: const [
               Text('Waiting'),
               Text('Progress'),
+              Text('Complete')
             ],
             indicatorColor: Colors.blue,
             indicatorSize: TabBarIndicatorSize.label,
@@ -204,7 +231,6 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
                         child: DataTable(
                           columnSpacing: 15,
                           columns: [
-                            DataColumn(label: Text('Id')),
                             DataColumn(label: Text('RoomNo')),
                             DataColumn(label: Text('Username')),
                             DataColumn(label: Text('Time At')),
@@ -213,7 +239,6 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
                           rows: tableDataListWaiting.map((data) {
                             return DataRow(
                               cells: [
-                                DataCell(Text(tableDataListWaiting.indexOf(data).toString())),
                                 DataCell(Text(data.roomNo.toString())),
                                 DataCell(Text(data.username)),
                                 DataCell(Text(data.timeAt.toString())),
@@ -228,6 +253,37 @@ class _DashBoardAdminState extends State<DashBoardAdmin> with TickerProviderStat
                   ),
                   FutureBuilder<List<TableData>>(
                       future: fetchProgressTableData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator(color: Colors.blue);
+                        } else{
+                          List<TableData> tableDataListWaiting = snapshot.data!;
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: [
+                                DataColumn(label: Text('Index')),
+                                DataColumn(label: Text('Room No')),
+                                DataColumn(label: Text('Time At')),
+                                DataColumn(label: Text('Action')),
+                              ],
+                              rows: tableDataListWaiting.map((data) {
+                                return DataRow(
+                                  cells: [
+                                    DataCell(Text(tableDataListWaiting.indexOf(data).toString())),
+                                    DataCell(Text(data.roomNo.toString())),
+                                    DataCell(Text(data.timeAt.toString())),
+                                    DataCell(Text(data.action)),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                          );
+                        }
+                      }
+                  ),
+                  FutureBuilder<List<TableData>>(
+                      future: fetchCompletedTableData(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return CircularProgressIndicator(color: Colors.blue);

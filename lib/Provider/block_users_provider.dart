@@ -23,25 +23,20 @@ class BlockUsersProvider with ChangeNotifier{
     List<String> temp3 = [];
 
 
+    DocumentSnapshot<Map<String, dynamic>> result = await _firebaseFirestore.collection('Users').doc(adminblock).get();
 
-    QuerySnapshot<Map<String,dynamic>> result = await _firebaseFirestore.collection('Users').get();
-    List<QueryDocumentSnapshot<Map<String,dynamic>>> documents = result.docs;
 
     temp1.clear();
     temp2.clear();
     temp3.clear();
 
-    documents.forEach((element) {
-      // print(element.data()['block']);
-
-      if(element.data()['block'] == adminblock){
-        temp1?.add(element.data()['username']);
-        temp2?.add(element.data()['roomNo']);
-        temp3?.add(element.data()['uid']);
-      }
+    result.data()?.forEach((key, value) {
+      temp1.add(value['username']);
+      temp2.add(value['roomNo']);
+      temp3.add(value['uid']);
     });
 
-    // print("from provider $temp1");
+
 
     adminblockusers = temp1;
     blockuseroomNo = temp2;
